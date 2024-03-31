@@ -1,0 +1,52 @@
+using UnityEngine;
+
+public class MovementAndGlow : MonoBehaviour
+{
+    public AnimationCurve curve;
+
+    private bool shouldMove = true;
+    private bool shouldGlow = false;
+    private float time = 0f;
+    private Vector3 startPosition;
+    private Renderer renderer;
+
+    void Start()
+    {
+        startPosition = transform.position;
+        renderer = GetComponent<Renderer>();
+    }
+
+    void Update()
+    {
+        time += Time.deltaTime;
+
+        if (shouldMove)
+        {
+            MoveObject();
+        }
+        else if (shouldGlow)
+        {
+            GlowObject();
+        }
+    }
+
+    void MoveObject()
+    {
+        float eval = curve.Evaluate(time);
+        transform.position = startPosition + new Vector3(Mathf.Sin(eval), 0, 0);
+    }
+
+    void GlowObject()
+    {
+        float eval = curve.Evaluate(time);
+        float glowIntensity = Mathf.PingPong(eval, 1);
+        renderer.material.SetColor("_EmissionColor", new Color(glowIntensity, glowIntensity, glowIntensity));
+    }
+
+    public void SwitchMode(bool move)
+    {
+        shouldMove = move;
+        shouldGlow = !move;
+        time = 0f;
+    }
+}
